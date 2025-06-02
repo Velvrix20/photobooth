@@ -121,7 +121,7 @@ export default function GridItem({ item, contextObj, onLikeUpdate }) {
                     />
                 )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
-                    <FaArrowUpRightFromSquare className="text-white text-4xl" />
+                    <FaExternalLinkSquareAlt className="text-white text-4xl" />
                 </div>
                 <span className="absolute top-2 right-2 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded-md z-10">
                     ID: {String(photographer).substring(0, 6)}...
