@@ -12,7 +12,8 @@ const breakpointColumnsObj = {
     500: 1
 };
 
-export default function AllPhotos({photoGrid, contextObj}) {
+// Added onLikeUpdate to props
+export default function AllPhotos({photoGrid, contextObj, onLikeUpdate}) {
 
     return (
         <div className="w-fit overflow-x-hidden pt-3">
@@ -21,9 +22,14 @@ export default function AllPhotos({photoGrid, contextObj}) {
                 className="my-masonry-grid group-item sm:gap-4"
                 columnClassName="my-masonry-grid_column"
             >
-                {photoGrid?.map(({ alt, id, photographer, src, avg_color, photographer_url, type }) => (
-
-                    <GridItem contextObj={contextObj} imgSrc={src.original} photographer={photographer} imgAlt={alt} avg={avg_color} key={id} photographer_url={photographer_url} type={type} />
+                {photoGrid?.map((item) => (
+                    <GridItem
+                        item={item} // Pass the whole item
+                        contextObj={contextObj}
+                        key={item.id}
+                        onLikeUpdate={onLikeUpdate} // Pass the handler down
+                        // Removed individual props like imgSrc, photographer etc. as GridItem now takes 'item'
+                    />
                 ))}
             </Masonry>
         </div>
