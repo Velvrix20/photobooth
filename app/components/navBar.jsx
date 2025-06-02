@@ -1,221 +1,209 @@
-    "use client"
-    import Image from "next/image";
-    import Link from "next/link";
-    import { useRouter, usePathname } from "next/navigation";
-    import { useEffect, useRef, useState, useTransition } from "react";
-    import { useAuth } from "../context/AuthContext";
-    import { FaBars, FaTimes } from "react-icons/fa"; // Hamburger and Close icons
+"use client"
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useAuth } from "../context/AuthContext";
+import { FaBars, FaTimes, FaSearch } from "react-icons/fa";
 
-    export default function NavBar() {
-        const searchBox = useRef();
-        const pathName = usePathname();
-        const [placeholder, setPlaceholder] = useState("CTRL + K");
-        const [searchText, setSearchText] = useState(pathName ? `${pathName.slice(1).replace(/%20/g, ' ')}` : "");
-        const router = useRouter();
-        const [searchLoading, startTransition] = useTransition();
-        const { user, role, logout, logoUrl, loading: authLoading } = useAuth();
-        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu
+export default function NavBar() {
+    const searchBox = useRef();
+    const pathName = usePathname();
+    const [placeholder, setPlaceholder] = useState("CTRL + K");
+    const [searchText, setSearchText] = useState(pathName ? `${pathName.slice(1).replace(/%20/g, ' ')}` : "");
+    const router = useRouter();
+    const [searchLoading, startTransition] = useTransition();
+    const { user, role, logout, logoUrl, loading: authLoading } = useAuth();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-        const onSearchHandler = (path) => {
-            startTransition(() => {
-                router.push(path);
-            });
-        };
+    const onSearchHandler = (path) => {
+        startTransition(() => {
+            router.push(path);
+        });
+    };
 
-        const handleShortCut = (e) => {
-            const { ctrlKey, code } = e;
-
-            if (ctrlKey && code === "KeyK") {
-                e.preventDefault();
-                searchBox.current?.focus();
-                return
-            }
-            
-            if (ctrlKey && code === "KeyS") {
-                e.preventDefault();
-                searchBox.current?.focus();
-                return
-            }
-            
-            if (ctrlKey && code === "KeyL") {
-                e.preventDefault();
-                searchBox.current?.focus();
-                return
-            }
-            
-            if (ctrlKey && code === "KeyF") {
-                e.preventDefault();
-                searchBox.current?.focus();
-                return
-            }
-        }
-
-        const handleSubmit = (e) => {
+    const handleShortCut = (e) => {
+        if ((e.ctrlKey || e.metaKey) && ["KeyK", "KeyS", "KeyL", "KeyF"].includes(e.code)) {
             e.preventDefault();
-
-            if (String(searchText).length > 0) {
-                onSearchHandler(`/${searchText}`);
-            } else {
-                onSearchHandler(`/`);
-            }
+            searchBox.current?.focus();
         }
+    };
 
-        useEffect(() => {
-            document.addEventListener("keydown", (e) => handleShortCut(e));
-            return (
-                document.removeEventListener("keydown", (e) => handleShortCut(e))
-            );
-        }, []);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSearchHandler(searchText ? `/${searchText}` : `/`);
+        setIsMobileMenuOpen(false);
+    };
 
-        const handleLogout = async () => {
-            await logout();
-            // Optionally, redirect here if not handled in AuthContext
-            // router.push('/');
-        };
+    useEffect(() => {
+        document.addEventListener("keydown", handleShortCut);
+        return () => document.removeEventListener("keydown", handleShortCut);
+    }, []);
 
-        return (
-            <section className="w-full py-4 sm:px-12 px-5 flex bg-white dark:bg-[#161618] justify-between duration-[.5s] border-b border-b-black/10 focus-within:border-b-black/25 shadow-xl shadow-black/10 focus-within:sticky max-sm:sticky top-0 z-[200] items-center">
+    const handleLogout = async () => {
+        await logout();
+        setIsMobileMenuOpen(false);
+    };
+
+    return (
+        <>
+            {/* Main Navigation Bar */}
+            <header className="w-full py-4 sm:px-12 px-5 flex bg-white dark:bg-[#161618] justify-between duration-500 border-b border-black/10 shadow-xl shadow-black/10 sticky top-0 z-[200] items-center">
                 {/* Logo and Site Name */}
-                <Link href={"/"} className="font-bold text-lg uppercase cursor-pointer flex items-center gap-1 flex-shrink-0">
+                <Link href="/" className="font-bold text-lg uppercase cursor-pointer flex items-center gap-1 flex-shrink-0">
                     <Image
                         src={logoUrl || "/sly.svg"}
                         alt="Site Logo"
                         height={25}
                         width={25}
-                        className={`dark:brightness-0 dark:invert ${searchText || placeholder !== "CTRL + K" ? "max-sm:w-8" : ""}`}
+                        className="dark:brightness-0 dark:invert"
                         unoptimized={!!logoUrl}
                     />
-                    <span className={`font-bold ${searchText || placeholder !== "CTRL + K" || isMobileMenuOpen ? "max-sm:hidden" : ""}`}>Photobooth</span>
+                    <span className="max-sm:hidden font-bold">Photobooth</span>
                 </Link>
 
-                {/* Desktop Navigation Links */}
+                {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center space-x-4 ml-6">
-                    <Link href={"/about"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200">About</Link>
+                    <Link href="/about" className="text-sm sm:text-base hover:opacity-80 transition-opacity">About</Link>
                     {!authLoading && user && (
-                        <Link href={"/account"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200">Account</Link>
+                        <Link href="/account" className="text-sm sm:text-base hover:opacity-80 transition-opacity">Account</Link>
                     )}
                     {!authLoading && user && role === 'admin' && (
-                        <Link href={"/admin"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200">Admin</Link>
+                        <Link href="/admin" className="text-sm sm:text-base hover:opacity-80 transition-opacity">Admin</Link>
                     )}
                     {!authLoading && user && (role === 'admin' || role === 'moderator') && (
-                         <Link href={"/moderator"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200">Moderator Panel</Link>
+                        <Link href="/moderator" className="text-sm sm:text-base hover:opacity-80 transition-opacity">Moderator Panel</Link>
                     )}
                 </nav>
 
-                {/* Search Bar - Placed after desktop nav links and before auth links/hamburger on right */}
-                 <div className={`hidden md:flex rounded-lg items-center gap-2 ${searchText || placeholder !== "CTRL + K" ? "border-black dark:border-white" : "focus-within:border-black focus-within:dark:border-white"} border-2 border-transparent overflow-hidden px-3 py-2 capitalize ml-auto mr-4`}>
-                    {searchLoading && <Image
-                        src="/spinner.svg"
-                        alt="Loading spinner"
-                        width={20}
-                        height={20}
-                        className="dark:invert"
-                    />}
-                    <form onSubmit={handleSubmit}>
+                {/* Desktop Search */}
+                <div className="hidden md:flex items-center gap-2 ml-auto mr-4">
+                    {searchLoading && (
+                        <Image
+                            src="/spinner.svg"
+                            alt="Loading spinner"
+                            width={20}
+                            height={20}
+                            className="dark:invert"
+                        />
+                    )}
+                    <form onSubmit={handleSubmit} className="relative">
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="search"
                             ref={searchBox}
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            className="border-none outline-none bg-transparent placeholder-shown:w-[5.5rem] focus:w-40 lg:focus:w-56 w-32 capitalize"
-                            placeholder={`${placeholder}`}
-                            onFocus={() => setPlaceholder("Find item...")}
+                            className="pl-10 pr-4 py-2 rounded-lg border-2 border-transparent focus:border-black dark:focus:border-white bg-gray-100 dark:bg-gray-700 focus:bg-transparent focus:w-64 transition-all duration-200 outline-none"
+                            placeholder={placeholder}
+                            onFocus={() => setPlaceholder("Search...")}
                             onBlur={() => setPlaceholder("CTRL + K")}
                         />
                     </form>
                 </div>
 
-
-                {/* Desktop Auth Links & Hamburger Button Container */}
-                <div className="flex items-center">
-                    {/* Desktop Auth Links */}
-                    <div className="hidden md:flex items-center">
+                {/* Auth and Mobile Menu Button */}
+                <div className="flex items-center gap-4">
+                    {/* Desktop Auth */}
+                    <div className="hidden md:flex items-center gap-4">
                         {!authLoading && user ? (
                             <>
-                                <span className="text-sm sm:text-base mr-4 hidden lg:inline">{user.email}</span>
+                                <span className="text-sm hidden lg:inline truncate max-w-xs">{user.email}</span>
                                 <button
                                     onClick={handleLogout}
-                                    className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                    className="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                                 >
                                     Logout
                                 </button>
                             </>
                         ) : !authLoading && !user ? (
                             <>
-                                <Link href={"/login"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200 ml-2">Login</Link>
-                                <Link href={"/signup"} className="text-sm sm:text-base hover:opacity-80 transition-opacity duration-200 ml-2">Sign Up</Link>
+                                <Link href="/login" className="text-sm hover:opacity-80 transition-opacity">Login</Link>
+                                <Link href="/signup" className="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">Sign Up</Link>
                             </>
                         ) : (
-                          <div className="ml-4 h-8 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                         )}
                     </div>
 
-                    {/* Hamburger Menu Button - visible only on md and smaller screens */}
-                    <div className="md:hidden ml-3">
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            aria-label="Toggle mobile menu"
-                            className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                        >
-                            {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-                        </button>
-                    </div>
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle menu"
+                        className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                        {isMobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+                    </button>
                 </div>
-            </section>
+            </header>
 
-            {/* Mobile Menu Dropdown/Overlay */}
+            {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-[#161618] shadow-lg z-[190] border-b border-gray-200 dark:border-gray-700">
-                    <nav className="flex flex-col space-y-2 px-4 py-3">
-                        {/* Search Bar in Mobile Menu */}
-                        <div className={`flex md:hidden rounded-lg items-center gap-2 ${searchText || placeholder !== "CTRL + K" ? "border-black dark:border-white" : "focus-within:border-black focus-within:dark:border-white"} border-2 border-gray-300 dark:border-gray-600 overflow-hidden px-3 py-2 capitalize w-full mb-2`}>
-                             {searchLoading && <Image src="/spinner.svg" alt="Loading spinner" width={20} height={20} className="dark:invert"/>}
-                            <form onSubmit={handleSubmit} className="w-full">
+                <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-[190] pt-16" onClick={() => setIsMobileMenuOpen(false)}>
+                    <div className="bg-white dark:bg-[#161618] shadow-lg" onClick={(e) => e.stopPropagation()}>
+                        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                            <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                                <FaSearch className="text-gray-400" />
                                 <input
-                                    type="search" ref={searchBox} value={searchText} onChange={(e) => setSearchText(e.target.value)}
-                                    className="border-none outline-none bg-transparent placeholder-shown:w-full w-full capitalize"
+                                    type="search"
+                                    ref={searchBox}
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    className="flex-1 py-2 outline-none bg-transparent"
                                     placeholder="Search..."
+                                    autoFocus
                                 />
+                                {searchLoading && (
+                                    <Image
+                                        src="/spinner.svg"
+                                        alt="Loading spinner"
+                                        width={20}
+                                        height={20}
+                                        className="dark:invert"
+                                    />
+                                )}
                             </form>
                         </div>
 
-                        <Link href={"/about"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-                        {!authLoading && user && (
-                            <Link href={"/account"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Account</Link>
-                        )}
-                        {!authLoading && user && role === 'admin' && (
-                            <Link href={"/admin"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Admin</Link>
-                        )}
-                        {!authLoading && user && (role === 'admin' || role === 'moderator') && (
-                             <Link href={"/moderator"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Moderator Panel</Link>
-                        )}
-                        <hr className="border-gray-200 dark:border-gray-600 my-2"/>
-                        {/* Mobile Auth Links */}
-                        {!authLoading && user ? (
-                            <>
-                                <span className="block px-3 py-2 text-base font-medium text-gray-500 dark:text-gray-400 truncate">{user.email}</span>
-                                <button
-                                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                                    className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-700/30"
-                                >
-                                    Logout
-                                </button>
-                            </>
-                        ) : !authLoading && !user ? (
-                            <>
-                                <Link href={"/login"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
-                                <Link href={"/signup"} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Sign Up</Link>
-                            </>
-                        ) : (
-                          <div className="px-3 py-2">
-                            <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
-                          </div>
-                        )}
-                    </nav>
+                        <nav className="flex flex-col">
+                            <Link href="/about" className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+                            
+                            {!authLoading && user && (
+                                <Link href="/account" className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Account</Link>
+                            )}
+                            
+                            {!authLoading && user && role === 'admin' && (
+                                <Link href="/admin" className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Admin</Link>
+                            )}
+                            
+                            {!authLoading && user && (role === 'admin' || role === 'moderator') && (
+                                <Link href="/moderator" className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setIsMobileMenuOpen(false)}>Moderator Panel</Link>
+                            )}
+
+                            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                {!authLoading && user ? (
+                                    <>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">{user.email}</div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 px-2 py-1 rounded"
+                                        >
+                                            Logout
+                                        </button>
+                                    </>
+                                ) : !authLoading && !user ? (
+                                    <div className="flex flex-col gap-2">
+                                        <Link href="/login" className="text-center py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+                                        <Link href="/signup" className="text-center py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={() => setIsMobileMenuOpen(false)}>Sign Up</Link>
+                                    </div>
+                                ) : (
+                                    <div className="h-8 w-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                                )}
+                            </div>
+                        </nav>
+                    </div>
                 </div>
             )}
-            {/* End Mobile Menu */}
-            {/* Removed the potentially redundant div that was here, as search for mobile is in the menu now */}
-            </section>
-        );
-    }
+        </>
+    );
+}
