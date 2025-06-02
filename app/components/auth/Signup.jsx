@@ -19,7 +19,7 @@ export default function Signup() {
       return;
     }
     setLoading(true);
-    const { error }_ = await supabase.auth.signUp({ // Destructured to get error only
+    const { error } = await supabase.auth.signUp({ // Destructured to get error only
       email,
       password,
     });
