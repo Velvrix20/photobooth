@@ -2,7 +2,7 @@
 import { fetchImageApi_search } from "@/lib/utilities";
 import PopModal from "../components/PopModal";
 import NavBar from "../components/navBar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import AllPhotos from "../components/AllPhotos";
 import LoadindDiv from "../elements/LoadindDiv";
@@ -22,39 +22,48 @@ export default function SearchResultsPage({ params: { query } }) {
         status: false
     });
 
-    const searchHandler = async () => {
-        setIsLoading(true)
+    const searchHandler = useCallback(async () => {
+        setIsLoading(true);
+        setHasError(false);
         setPhotosArray([]);
         try {
-            const preLoad = fetchImageApi_search;
-            const photosResult = await preLoad(query);
-            setPhotosArray([...photosResult]);
-            toast.success(`Search Results: ${photosResult.length}`, {
-                style: {
-                  border: '1px solid #713200',
-                  padding: '16px',
-                  color: '#713200',
-                },
-                iconTheme: {
-                  primary: '#713200',
-                  secondary: '#FFFAEE',
-                },
-              });
+            const photosResult = await fetchImageApi_search(query);
+            setPhotosArray(photosResult);
+            if (photosResult.length > 0) {
+                toast.success(`Search Results: ${photosResult.length}`, {
+                    style: {
+                        border: '1px solid #713200',
+                        padding: '16px',
+                        color: '#713200',
+                    },
+                    iconTheme: {
+                        primary: '#713200',
+                        secondary: '#FFFAEE',
+                    },
+                });
+            }
         } catch (error) {
+            console.error("Search error:", error);
             setHasError(true);
-        }finally{
+            toast.error("Failed to fetch search results", {
+                style: {
+                    border: '1px solid #ff0000',
+                    padding: '16px',
+                    color: '#ff0000',
+                },
+            });
+        } finally {
             setIsLoading(false);
         }
-    }
-
-    useEffect(() => {
-        searchHandler()
     }, [query]);
 
-    const viewPop = (data) => {
+    useEffect(() => {
+        searchHandler();
+    }, [searchHandler]);
+
+    const viewPop = useCallback((data) => {
         const { src, alt, photographer, photographerLink, avg_color } = data;
         setPopData({
-            ...popData,
             imgSrc: src,
             imgAlt: alt,
             photographer,
@@ -62,7 +71,12 @@ export default function SearchResultsPage({ params: { query } }) {
             avg_color,
             status: true
         });
-    }
+    }, []);
+
+    const closeModal = useCallback(() => {
+        setPopData(prev => ({ ...prev, status: false }));
+    }, []);
+
     return (
         <searchContext.Provider value={{ viewPop }}>
             <main className="w-screen h-screen overflow-auto">
@@ -70,14 +84,22 @@ export default function SearchResultsPage({ params: { query } }) {
                 <Toaster
                     position="bottom-right"
                     reverseOrder={false}
-                 />
-                {!hasError && <div className="p-1">
-                    <AllPhotos photoGrid={photosArray} contextObj={searchContext} />
-                </div>}
-                {isLoading && <LoadindDiv />}
-                {!isLoading && !hasError && photosArray.length === 0 && <NoImage />}
-                {!isLoading && !hasError && photosArray.length > 0 && <div className="p-3 mx-auto justify-center text-center">You&apos;ve reached the end</div>}
-                {hasError && <div className="p-3 mx-auto justify-center text-center">Oops! an error occured, refresh page</div> }
+                />
+                <div className="p-1">
+                    {!hasError && !isLoading && photosArray.length > 0 && (
+                        <AllPhotos photoGrid={photosArray} contextObj={searchContext} />
+                    )}
+                    {isLoading && <LoadindDiv />}
+                    {!isLoading && !hasError && photosArray.length === 0 && <NoImage />}
+                    {!isLoading && !hasError && photosArray.length > 0 && (
+                        <div className="p-3 mx-auto justify-center text-center">You&apos;ve reached the end</div>
+                    )}
+                    {hasError && (
+                        <div className="p-3 mx-auto justify-center text-center">
+                            Oops! An error occurred. Please refresh the page or try again later.
+                        </div>
+                    )}
+                </div>
                 <PopModal
                     avg={popData.avg_color}
                     imgAlt={popData.imgAlt}
@@ -86,7 +108,7 @@ export default function SearchResultsPage({ params: { query } }) {
                     photographerUrl={popData.photographerLink}
                     status={popData.status}
                     key={popData.avg_color}
-                    clean={setPopData}
+                    clean={closeModal}
                 />
             </main>
         </searchContext.Provider>
