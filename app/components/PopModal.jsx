@@ -1,5 +1,5 @@
 "use client"
-import { FaDownload, FaEyeDropper, FaUserAstronaut, FaX, FaShareSquare } from "react-icons/fa";
+import { FaDownload, FaEyeDropper, FaUserAstronaut, FaTimes, FaShareSquare } from "react-icons/fa";
 import "../styles/popModal.css";
 import { useEffect, useState } from "react";
 import Link from "next/link";
