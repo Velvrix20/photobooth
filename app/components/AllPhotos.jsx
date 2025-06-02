@@ -21,9 +21,9 @@ export default function AllPhotos({photoGrid, contextObj}) {
                 className="my-masonry-grid group-item sm:gap-4"
                 columnClassName="my-masonry-grid_column"
             >
-                {photoGrid?.map(({ alt, id, photographer, src, avg_color, photographer_url }) => (
+                {photoGrid?.map(({ alt, id, photographer, src, avg_color, photographer_url, type }) => (
 
-                    <GridItem contextObj={contextObj} imgSrc={src.original} photographer={photographer} imgAlt={alt} avg={avg_color} key={id} photographer_url={photographer_url} />
+                    <GridItem contextObj={contextObj} imgSrc={src.original} photographer={photographer} imgAlt={alt} avg={avg_color} key={id} photographer_url={photographer_url} type={type} />
                 ))}
             </Masonry>
         </div>
