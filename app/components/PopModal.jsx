@@ -8,7 +8,7 @@ import { copyToClipboard } from "../lib/utils";
 import { downloadHandler } from "@/lib/utilities";
 import toast from "react-hot-toast";
 
-export default function PopModal({imgSrc, imgAlt, photographer, avg, photographerUrl, status, clean}) {
+export default function PopModal({imgSrc, imgAlt, photographer, avg, photographerUrl, status, clean, type}) { // Added type prop
     const [modalShowing, setModalShowing] = useState(status);
 
     useEffect(()=>{
@@ -19,28 +19,36 @@ export default function PopModal({imgSrc, imgAlt, photographer, avg, photographe
                 photographer: "",
                 photographerLink: "",
                 avg_color: "",
-                status: false
+                status: false,
+                type: "" // Reset type
               });
         }
     }, [modalShowing]);
 
     const performDownload = () => {
-        const promise = downloadHandler({imgAlt, imgSrc});
+        // Adjust download logic if needed for videos, e.g., naming or specific handling
+        const mediaType = type === 'video' ? 'Video' : 'Image';
+        const promise = downloadHandler({imgAlt, imgSrc, type}); // Pass type to downloadHandler
         toast.promise(promise, {
-            loading: "Downloading Image...",
-            error: "Failed to download image.",
-            success: "Image downloaded successfully."
+            loading: `Downloading ${mediaType}...`,
+            error: `Failed to download ${mediaType}.`,
+            success: `${mediaType} downloaded successfully.`
         });
     }
 
     return (
         <div className={`popModal sm:p-[5rem] ${modalShowing ? "in" : "out"}`}>
             <div className="modal">
-                <div className="img relative" style={{background: `${avg}`, color: `${avg}`, backgroundImage: `url(${imgSrc})`}}>    
+                {/* Conditional rendering for image or video */}
+                <div className="img relative" style={type !== 'video' ? {background: `${avg}`, color: `${avg}`, backgroundImage: `url(${imgSrc})`} : {background: '#000', color: '#000'} }>
                     <span className="absolute top-3 left-3 cursor-pointer w-[30px] h-[30px] grid place-items-center bg-white text-2xl rounded-full z-30 max-w-[20rem] text-ellipsis whitespace-nowrap overflow-hidden hover:scale-105 active:scale-95 active:opacity-50 close hover:text-red-600 border border-black/10 hover:border-red-600/40" onClick={()=>setModalShowing(false)}>
                         <FaX className="text-sm" />
                     </span>
-                    {imgSrc && <Image height={800} width={600} src={imgSrc} alt={imgAlt} className="" priority />}
+                    {imgSrc && type === 'video' ? (
+                        <video src={imgSrc} controls autoPlay className="w-full h-full object-contain" />
+                    ) : imgSrc ? (
+                        <Image height={800} width={600} src={imgSrc} alt={imgAlt} className="" priority />
+                    ) : null}
                 </div>
                 {imgAlt && <section className="p-5 bg-slate-100 dark:bg-[#1f1f22] text-center border-b border-b-black/10">
                     <span className="text-black px-4 sm:text-base text-sm rounded-md dark:text-white text-ellipsis text-center">{imgAlt}</span>
