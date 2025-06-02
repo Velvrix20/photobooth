@@ -1,4 +1,4 @@
-import { FaImage, FaRegImages } from "react-icons/fa6";
+import { FaImage, FaRegImages } from "react-icons/fa";
 
 export default function NoImage() {
     return (
