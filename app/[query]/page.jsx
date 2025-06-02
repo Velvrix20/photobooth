@@ -92,7 +92,9 @@ export default function SearchResultsPage({ params: { query } }) {
                     {isLoading && <LoadindDiv />}
                     {!isLoading && !hasError && photosArray.length === 0 && <NoImage />}
                     {!isLoading && !hasError && photosArray.length > 0 && (
-                        <div className="p-3 mx-auto justify-center text-center">You&apos;ve reached the end</div>
+                        <div className="p-3 mx-auto justify-center text-center">
+                            You&apos;ve reached the end
+                        </div>
                     )}
                     {hasError && (
                         <div className="p-3 mx-auto justify-center text-center">
@@ -113,4 +115,4 @@ export default function SearchResultsPage({ params: { query } }) {
             </main>
         </searchContext.Provider>
     )
-}
+              }
