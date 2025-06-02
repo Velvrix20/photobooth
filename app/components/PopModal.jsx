@@ -127,7 +127,7 @@ export default function PopModal({
                     <div className="img relative" style={type !== 'video' ? {background: `${avg}`, color: `${avg}`} : {background: '#000', color: '#000'} }> {/* Removed backgroundImage for Next Image */}
                         {/* Removed absolute close button from here, moved to header */}
                         <FaX className="text-sm" />
-                    </span>
+                    </div>
                         {imgSrc && type === 'video' ? (
                             <video src={imgSrc} controls autoPlay className="w-full max-h-[60vh] object-contain" />
                         ) : imgSrc ? (
