@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-import { FaArrowUpRightFromSquare, FaHeart, FaRegHeart, FaShareSquare } from "react-icons/fa6";
+import { FaArrowUpRightFromSquare, FaHeart, FaRegHeart, FaShareSquare } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
