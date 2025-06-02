@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import withAuth from '@/app/components/auth/withAuth';
 import { useAuth } from '@/app/context/AuthContext';
 import MediaUploadForm from '@/app/components/forms/MediaUploadForm';
@@ -11,7 +11,8 @@ import SystemLogsViewer from '@/app/components/admin/SystemLogsViewer';
 function AdminPageInternal() {
   const {
     user,
-    maintenanceMode, updateMaintenanceStatus,
+    maintenanceMode, 
+    updateMaintenanceStatus,
     loading: authLoading
   } = useAuth();
 
@@ -37,7 +38,7 @@ function AdminPageInternal() {
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 space-y-8">
         <div>
           <p className="text-gray-700 dark:text-gray-300">
-            Welcome to the Admin Panel, {user?.email || &apos;Admin&apos;}. Only users with the &apos;admin&apos; role can see this page.
+            Welcome to the Admin Panel, {user?.email || 'Admin'}. Only users with the admin role can see this page.
           </p>
         </div>
 
