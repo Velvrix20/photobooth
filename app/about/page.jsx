@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebook, FaInstagram, FaPinterest, FaWhatsapp, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaPinterest, FaWhatsapp, FaPhone, FaEnvelope } from 'react-icons/fa6';
 
 const AboutPage = () => {
   const iconSize = '2rem'; // Consistent icon size
