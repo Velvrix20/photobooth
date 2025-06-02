@@ -114,13 +114,13 @@ export default function PopModal({
             <div className="modal flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl max-h-[90vh] w-full max-w-3xl">
                 <div className="flex justify-end p-2 sticky top-0 bg-white dark:bg-gray-800 z-10 border-b dark:border-gray-700">
                     <button title="Close modal" className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" onClick={() => setModalShowing(false)}>
-                        <FaX className="text-sm text-gray-600 dark:text-gray-300" />
+                        <FaTimes className="text-sm text-gray-600 dark:text-gray-300" />
                     </button>
                 </div>
 
                 <div className="overflow-y-auto flex-grow">
                     <div className="img relative" style={type !== 'video' ? { background: `${avg}`, color: `${avg}` } : { background: '#000', color: '#000' }}>
-                        <FaX className="text-sm" />
+                        <FaTimes className="text-sm" />
                     </div>
                     {imgSrc && type === 'video' ? (
                         <video src={imgSrc} controls autoPlay className="w-full max-h-[60vh] object-contain" />
