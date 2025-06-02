@@ -37,7 +37,7 @@ export default function MediaUploadForm() {
     const fileExtension = fileNameParts.pop();
     const baseName = fileNameParts.join('.');
     // Create a unique file path: user_id/timestamp_uuid_basename.extension
-    const filePath = `${user.id}/${Date.now()}_${uuidv4().slice(0,8)}_${baseName}.${fileExtension}`;
+    const filePath = `images/${Date.now()}_${uuidv4().slice(0,8)}_${baseName}.${fileExtension}`;
 
     try {
       // 1. Upload file to Supabase Storage
