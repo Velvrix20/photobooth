@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { FaFacebook, FaInstagram, FaPinterest, FaWhatsapp, FaPhone, FaEnvelope } from 'react-icons/fa6';
+import { FaFacebook, FaInstagram, FaPinterest, FaWhatsapp, FaPhone, FaEnvelope } from 'react-icons/fa';
 
 const AboutPage = () => {
   const iconSize = '2rem'; // Consistent icon size
